@@ -4,5 +4,14 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Main Menu.unity
+    guid: 51b27fb1a091e6d4f98858f2bcccb655
+  - enabled: 1
+    path: Assets/Scenes/Assessment.unity
+    guid: b31cbc2073e93c3439d3cf407da1bded
+  - enabled: 1
+    path: Assets/Scenes/Hospital.unity
+    guid: 8a89a32ce0f14dd44a3f822efdb4c9c9
   m_configObjects: {}
