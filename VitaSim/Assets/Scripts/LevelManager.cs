@@ -1,18 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
-public class LevelManager : MonoBehaviour
+public interface LevelManager
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public static LevelManager Inst;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public void StartLevel(Action<int> OnFinish);
+
+    public void CompleteLevel();
 }

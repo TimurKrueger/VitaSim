@@ -1,18 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using static UnityEngine.InputSystem.InputAction;
 using UnityEngine;
+using TMPro;
 
 public class FirstPersonController : MonoBehaviour
 {
+    #region Singletion
+    public static FirstPersonController Instance;
+
+    private void EnforceSingleton()
+    {
+        if (Instance == null) Instance = this;
+        else if (Instance != this) Destroy(this);
+    }
+    #endregion
+
     // References
-    public Transform cameraTransform;
     public CharacterController characterController;
+    [SerializeField] public Transform cameraTransform;
+    [SerializeField] private Interactable currentInteractable;
 
     // Player settings
     public float cameraSensitivity;
     public float moveSpeed;
     public float moveInputDeadZone;
+    private bool canMove = true;
+    [SerializeField] private float interactionRange = 1.5f;
+
 
     // Touch detection
     int leftFingerId, rightFingerId;
@@ -25,6 +41,11 @@ public class FirstPersonController : MonoBehaviour
     // Camera movement;
     Vector2 moveTouchStartPosition;
     Vector2 moveInput;
+
+    private void Awake()
+    {
+        EnforceSingleton();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -41,6 +62,8 @@ public class FirstPersonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(!canMove) return;
+
         GetTouchInput();
 
         if (rightFingerId != -1)
@@ -109,6 +132,7 @@ public class FirstPersonController : MonoBehaviour
             }
         }
     }
+
     void LookAround()
     {
         // Vertical pitch rotation
@@ -129,5 +153,54 @@ public class FirstPersonController : MonoBehaviour
 
         // Move relatively to the local transform's direction
         characterController.Move(transform.right * movementDirection.x + transform.forward * movementDirection.y);
+    }
+
+    public void PauseMovement()
+    {
+        canMove = false;
+    }
+
+    public void ResumeMovement()
+    {
+        canMove = true;
+    }
+
+    public void UpdateTextPrompt(string hitObject)
+    {
+        if (hitObject.Contains("Level1"))
+        {
+            hitObject = "Level1";
+        }
+        if (hitObject.Contains("Level2"))
+        {
+            hitObject = "Level2";
+        }
+        switch (hitObject)
+        {
+            case "Level1":
+                UIInteractPrompt.Instance.promptText.text = "Press Interact button to start Level 1";
+                break;
+            case "Level2":
+                UIInteractPrompt.Instance.promptText.text = "Press Interact button to start Level 2";
+                break;
+        }
+    }
+
+    public void Interact()
+    {
+        if(currentInteractable != null)
+        {
+            currentInteractable.Interact();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        RaycastHit hit;
+
+        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, interactionRange, LayerMask.GetMask("Interactable")))
+        {
+            var interactable = hit.transform.GetComponent<Interactable>();
+        }
     }
 }
