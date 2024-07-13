@@ -89,14 +89,12 @@ public class FirstPersonController : MonoBehaviour
                     if (t.position.x < halfScreenWidth && leftFingerId == -1)
                     {
                         leftFingerId = t.fingerId;
-                        Debug.Log("Tracking left finger");
 
                         moveTouchStartPosition = t.position;
                     }
                     else if (t.position.x > halfScreenWidth && rightFingerId == -1)
                     {
                         rightFingerId = t.fingerId;
-                        Debug.Log("Tracking right finger");
                     }
                     break;
                 case TouchPhase.Ended:
@@ -104,12 +102,10 @@ public class FirstPersonController : MonoBehaviour
                     if (t.fingerId == leftFingerId)
                     {
                         leftFingerId = -1;
-                        Debug.Log("Stopped tracking left finger");
                     }
                     else if (t.fingerId == rightFingerId)
                     {
                         rightFingerId = -1;
-                        Debug.Log("Stopped tracking right finger");
                     }
                     break;
                 case TouchPhase.Moved: 
@@ -192,7 +188,7 @@ public class FirstPersonController : MonoBehaviour
 
         if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, interactionRange, LayerMask.GetMask("Interactable")))
         {
-            var interactable = hit.transform.GetComponent<Interactable>();
+            var interactable = hit.transform.GetComponentInParent<Interactable>();
 
             if(interactable != null)
             {
