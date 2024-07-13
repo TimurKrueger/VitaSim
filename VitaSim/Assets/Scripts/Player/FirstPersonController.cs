@@ -29,7 +29,6 @@ public class FirstPersonController : MonoBehaviour
     private bool canMove = true;
     [SerializeField] private float interactionRange = 1.5f;
 
-
     // Touch detection
     int leftFingerId, rightFingerId;
     float halfScreenWidth;
@@ -55,7 +54,7 @@ public class FirstPersonController : MonoBehaviour
 
         halfScreenWidth = Screen.width / 2;
 
-        // Calculate the movement inpu
+        // Calculate the movement input
         moveInputDeadZone = Mathf.Pow(Screen.height / moveInputDeadZone, 2);
     }
    
@@ -186,21 +185,36 @@ public class FirstPersonController : MonoBehaviour
         }
     }
 
-    public void Interact()
-    {
-        if(currentInteractable != null)
-        {
-            currentInteractable.Interact();
-        }
-    }
-
     private void FixedUpdate()
     {
         RaycastHit hit;
+        bool foundInteractable = false;
 
         if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, interactionRange, LayerMask.GetMask("Interactable")))
         {
             var interactable = hit.transform.GetComponent<Interactable>();
+
+            if(interactable != null)
+            {
+                currentInteractable = interactable;
+                foundInteractable = true;
+                InteractButtonController.Instance.ShowButton();
+            }
+
+            if (!foundInteractable)
+            {
+                currentInteractable = null;
+                InteractButtonController.Instance.HideButton();
+            }
+        }
+    }
+
+    public void Interact()
+    {
+        Debug.Log("Interacting");
+        if (currentInteractable != null)
+        {
+            currentInteractable.Interact();
         }
     }
 }
