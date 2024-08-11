@@ -5,35 +5,76 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
-public class AssesmentManager : MonoBehaviour
+public class AssessmentManager : MonoBehaviour
 {
+    public List<GameObject> questionPanels;
+    private int currentQuestionIndex = 0;
+    private List<float> answers;
+
     public Slider stressLevelSlider;
     public TextMeshProUGUI valueText;
 
     void Start()
     {
-        // Initialize the slider value and text
         stressLevelSlider.value = 0;
         UpdateValueText(stressLevelSlider.value);
-
-        // Add listener to update text when slider value changes
         stressLevelSlider.onValueChanged.AddListener(delegate { ValueChangeCheck(); });
+
+        answers = new List<float>(new float[questionPanels.Count]);
+        ShowQuestion(currentQuestionIndex);
     }
 
     void ValueChangeCheck()
     {
-        // Update the text with the current slider value
         UpdateValueText(stressLevelSlider.value);
     }
 
     void UpdateValueText(float value)
     {
-        // Format and update the value text
         valueText.text = value.ToString("0");
     }
-    
-    public void StartGame()
+
+    public void NextQuestion()
     {
-        SceneManager.LoadScene("Hospital");
+        // Save the answer
+        SaveAnswer(currentQuestionIndex);
+
+        // Hide current question
+        questionPanels[currentQuestionIndex].SetActive(false);
+
+        // Increment question index
+        currentQuestionIndex++;
+
+        // Check if there are more questions
+        if (currentQuestionIndex < questionPanels.Count)
+        {
+            // Show the next question
+            ShowQuestion(currentQuestionIndex);
+        }
+        else
+        {
+            // All questions answered, proceed to the next scene or process results
+            Debug.Log("Questionnaire completed");
+            foreach (var answer in answers)
+            {
+                Debug.Log("Answer: " + answer);
+            }
+            SceneManager.LoadScene("Hospital");
+        }
+    }
+
+    void ShowQuestion(int index)
+    {
+        questionPanels[index].SetActive(true);
+    }
+
+    void SaveAnswer(int index)
+    {
+        // Find the slider in the current question panel and save its value
+        Slider slider = questionPanels[index].GetComponentInChildren<Slider>();
+        if (slider != null)
+        {
+            answers[index] = slider.value;
+        }
     }
 }

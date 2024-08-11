@@ -20,14 +20,14 @@ public class FirstPersonController : MonoBehaviour
     // References
     public CharacterController characterController;
     [SerializeField] public Transform cameraTransform;
-    [SerializeField] private Interactable currentInteractable;
+    //[SerializeField] private Interactor currentInteractable;
 
     // Player settings
     public float cameraSensitivity;
     public float moveSpeed;
     public float moveInputDeadZone;
     private bool canMove = true;
-    [SerializeField] private float interactionRange = 1.5f;
+    [SerializeField] private float interactionRange = 4.0f;
 
     // Touch detection
     int leftFingerId, rightFingerId;
@@ -40,6 +40,9 @@ public class FirstPersonController : MonoBehaviour
     // Camera movement;
     Vector2 moveTouchStartPosition;
     Vector2 moveInput;
+
+    //public System.Action<Interactable> OnFindInteractable;
+    //public System.Action<Interactable> OnLoseInteractable;
 
     private void Awake()
     {
@@ -67,12 +70,10 @@ public class FirstPersonController : MonoBehaviour
 
         if (rightFingerId != -1)
         {
-            Debug.Log("Rotating");
             LookAround();
         }
         if(leftFingerId != -1)
         {
-            Debug.Log("Moving");
             Move();
         }
     }
@@ -148,69 +149,5 @@ public class FirstPersonController : MonoBehaviour
 
         // Move relatively to the local transform's direction
         characterController.Move(transform.right * movementDirection.x + transform.forward * movementDirection.y);
-    }
-
-    public void PauseMovement()
-    {
-        canMove = false;
-    }
-
-    public void ResumeMovement()
-    {
-        canMove = true;
-    }
-
-    public void UpdateTextPrompt(string hitObject)
-    {
-        if (hitObject.Contains("Level1"))
-        {
-            hitObject = "Level1";
-        }
-        if (hitObject.Contains("Level2"))
-        {
-            hitObject = "Level2";
-        }
-        switch (hitObject)
-        {
-            case "Level1":
-                UIInteractPrompt.Instance.promptText.text = "Press Interact button to start Level 1";
-                break;
-            case "Level2":
-                UIInteractPrompt.Instance.promptText.text = "Press Interact button to start Level 2";
-                break;
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        RaycastHit hit;
-        bool foundInteractable = false;
-
-        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, interactionRange, LayerMask.GetMask("Interactable")))
-        {
-            var interactable = hit.transform.GetComponentInParent<Interactable>();
-
-            if(interactable != null)
-            {
-                currentInteractable = interactable;
-                foundInteractable = true;
-                InteractButtonController.Instance.ShowButton();
-            }
-
-            if (!foundInteractable)
-            {
-                currentInteractable = null;
-                InteractButtonController.Instance.HideButton();
-            }
-        }
-    }
-
-    public void Interact()
-    {
-        Debug.Log("Interacting");
-        if (currentInteractable != null)
-        {
-            currentInteractable.Interact();
-        }
     }
 }
