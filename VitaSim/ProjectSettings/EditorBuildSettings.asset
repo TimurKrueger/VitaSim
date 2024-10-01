@@ -17,5 +17,14 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ClearViruses.unity
     guid: e7a40eeea8fbf4e6a8a2c626567159bd
+  - enabled: 1
+    path: Assets/2D Game/Assets/Scenes/Level1.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/2D Game/Assets/Scenes/Level2.unity
+    guid: 7e6231d428ce88442bdc82524cc7b4a9
+  - enabled: 1
+    path: Assets/2D Game/Assets/Scenes/Level3.unity
+    guid: dc18fe53f7840c04baa8baa3fd82dbda
   m_configObjects:
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 6ba78109d2f73e24692e03a4c40a7466, type: 2}

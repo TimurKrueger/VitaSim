@@ -10,12 +10,12 @@ public class Interactor : MonoBehaviour
     [SerializeField] private float _interactionPointRadius = 1.0f;
     [SerializeField] private LayerMask _interactableMask;
     [SerializeField] private Button _interactionButton;
-    [SerializeField] private InteractionPromptUI _interactionPromptUI;
+    [SerializeField] private Camera playerCamera;
 
     private readonly Collider[] _colliders = new Collider[3];
     [SerializeField] private int _numFound;
 
-    private IInteractable _interactable;
+    private IInteractable _currentInteractable;
 
     private void Start()
     {
@@ -25,37 +25,50 @@ public class Interactor : MonoBehaviour
         }
     }
 
-    // Maybe I need this to draw gizmos later, or if the button is shown or hidden
-    private void Update()
-    {
-        _numFound = Physics.OverlapSphereNonAlloc(_interactionPoint.position, _interactionPointRadius, _colliders, _interactableMask);
+    private void Update() {
+        _numFound = Physics.OverlapSphereNonAlloc(
+            _interactionPoint.position,
+            _interactionPointRadius,
+            _colliders,
+            _interactableMask
+        );
 
-        if (_numFound > 0)
-        {
-            _interactable = _colliders[0].GetComponent<IInteractable>();
+        if (_numFound > 0) {
+            Debug.Log("Interactable found");
+            IInteractable interactable = _colliders[0].GetComponentInParent<IInteractable>();
 
-            _interactionButton.gameObject.SetActive(true);
+            if (interactable != null && interactable.IsInteractable) {
+                if (_currentInteractable != interactable) {
+                    _currentInteractable?.HidePrompt();
+                    _currentInteractable = interactable;
+                    _currentInteractable.ShowPrompt();
+                }
 
-            if(_interactable != null)
-            {
-                if (!_interactionPromptUI.isDisplayed)
-                {
-                    _interactionPromptUI.Setup(_interactable.InteractionPrompt);
+                _interactionButton.gameObject.SetActive(true);
+
+                if (Input.GetKeyDown(KeyCode.E)) {
+                    _currentInteractable.Interact(this);
                 }
             }
-        } else
-        {
-            _interactionButton.gameObject.SetActive(false);
-
-            if (_interactable != null)
-            {
-                _interactable = null;
+            else {
+                if (_currentInteractable != null) {
+                    HideInteractionUI();
+                }
             }
-
-            if (_interactionPromptUI.isDisplayed)
-            {
-                _interactionPromptUI.Close();
+        }
+        else {
+            if (_currentInteractable != null) {
+                HideInteractionUI();
             }
+        }
+    }
+
+    private void HideInteractionUI() {
+        _interactionButton.gameObject.SetActive(false);
+
+        if (_currentInteractable != null) {
+            _currentInteractable.HidePrompt();
+            _currentInteractable = null;
         }
     }
 
@@ -65,11 +78,11 @@ public class Interactor : MonoBehaviour
 
         if (_numFound > 0)
         {
-            _interactable = _colliders[0].GetComponent<IInteractable>();
+            _currentInteractable = _colliders[0].GetComponentInParent<IInteractable>();
 
-            if (_interactable != null)
+            if (_currentInteractable != null)
             {
-                _interactable.Interact(this);
+                _currentInteractable.Interact(this);
             }
         }
     }

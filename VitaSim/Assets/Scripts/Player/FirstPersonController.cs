@@ -52,6 +52,8 @@ public class FirstPersonController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+
         leftFingerId = -1;
         rightFingerId = -1;
 
@@ -64,7 +66,8 @@ public class FirstPersonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!canMove) return;
+        // Touch Input
+        if (!canMove) return;
 
         GetTouchInput();
 
