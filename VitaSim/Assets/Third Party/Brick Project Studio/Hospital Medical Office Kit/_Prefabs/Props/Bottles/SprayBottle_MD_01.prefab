@@ -267,6 +267,7 @@ GameObject:
   - component: {fileID: 4065641374349530963}
   - component: {fileID: 3154634020760024632}
   - component: {fileID: 8768525868889232595}
+  - component: {fileID: 7015109337933757981}
   m_Layer: 0
   m_Name: SprayBottle_MD_01
   m_TagString: Untagged
@@ -374,6 +375,27 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300144, guid: 218e68caea70abc45803acb387555931, type: 3}
+--- !u!135 &7015109337933757981
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4065641374347593873}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0.000000007450582, y: 0.20620666, z: -0.0000000093132275}
 --- !u!1 &4325041593658398181
 GameObject:
   m_ObjectHideFlags: 0

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SanitizerSprayCan : MonoBehaviour, IInteractable {
-    public string InteractionPrompt => "Pick up sanitizer spray can";
+    public string InteractionPrompt => "I guess this helps clearing viruses";
     private InteractionPromptUI promptUI;
 
     private void Awake() {
@@ -16,7 +16,7 @@ public class SanitizerSprayCan : MonoBehaviour, IInteractable {
         }
     }
 
-    public bool Interact(Interactor interactor) {
+    public bool Interact(Interactor interactor) { 
         HospitalManager.Instance.UpdateGameState(GameState.DestroyAllViruses);
         return true;
     }

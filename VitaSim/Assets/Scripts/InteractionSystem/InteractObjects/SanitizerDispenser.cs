@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SanitizerDispenser: MonoBehaviour, IInteractable {
-    public string InteractionPrompt => "Sanitize your hands";
+    public string InteractionPrompt => "I think this is important";
     private InteractionPromptUI promptUI;
 
     private void Awake() {

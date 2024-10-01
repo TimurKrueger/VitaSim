@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
 
-    public class UIManager : MonoBehaviour
+public class UIManager : MonoBehaviour
     {
         [Header("Menu Handling")]
         public static UIManager Instance;
@@ -13,9 +13,10 @@ using UnityEngine.UI;
         [SerializeField] private GameObject pauseMenu;
         [SerializeField] private GameObject hudCanvas;
         [SerializeField] private TextMeshProUGUI taskText;
-        [SerializeField] private TextMeshProUGUI dailyTaskText;
+        [SerializeField] private TextMeshProUGUI dailyTaskText; 
+        [SerializeField] public GameObject noteUIPanel;
 
-        void Awake()
+    void Awake()
         {
             if (Instance != null && Instance != this)
             {
@@ -36,4 +37,12 @@ using UnityEngine.UI;
         {
             dailyTaskText.text = task;
         }
+
+    public void ShowNoteUI() {
+        noteUIPanel.SetActive(true);
     }
+
+    public void HideNoteUI() {
+        noteUIPanel.SetActive(false);
+    }
+}

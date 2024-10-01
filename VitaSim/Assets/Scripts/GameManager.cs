@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/*
 public class GameManager : MonoBehaviour
 {
     public enum Level
@@ -59,3 +59,4 @@ public class GameManager : MonoBehaviour
         LevelManager.Inst = null;
     }
 }
+*/

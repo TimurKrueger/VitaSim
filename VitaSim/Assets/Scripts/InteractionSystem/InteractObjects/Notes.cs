@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Patient: MonoBehaviour, IInteractable {
-    public string InteractionPrompt => "Can you help me please!";
+public class Notes: MonoBehaviour, IInteractable {
+    public string InteractionPrompt => "Article about viruses";
     private InteractionPromptUI promptUI;
 
     private void Awake() {
@@ -12,7 +12,7 @@ public class Patient: MonoBehaviour, IInteractable {
 
     public bool IsInteractable {
         get {
-            return HospitalManager.Instance.State == GameState.GiveMedicationToPatient;
+            return HospitalManager.Instance.State == GameState.ReadAllNotes;
         }
     }
 
@@ -22,7 +22,11 @@ public class Patient: MonoBehaviour, IInteractable {
             return false;
         }
 
-        HospitalManager.Instance.UpdateGameState(GameState.ReportFindingsToDoctor);
+        UIManager.Instance.ShowNoteUI();
+        interactor.enabled = false;
+
+        HospitalManager.Instance.UpdateGameState(GameState.PickUpSanitizerSprayCan);
+        Destroy(gameObject);
         return true;
     }
 

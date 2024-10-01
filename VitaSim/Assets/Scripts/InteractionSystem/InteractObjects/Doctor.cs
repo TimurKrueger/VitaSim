@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Doctor: MonoBehaviour, IInteractable {
-    public string InteractionPrompt => "Talk to chief doctor";
-    public string InteractionPrompt2 => "Report findings to chief doctor";
-    public string InteractionPrompt3 => "Submit report to chief doctor";
+    public string InteractionPrompt => "I have a task for you!";
+    public string InteractionPrompt2 => "Thanks for helping me out!";
+    public string InteractionPrompt3 => "Good job!";
 
     private InteractionPromptUI promptUI;
 

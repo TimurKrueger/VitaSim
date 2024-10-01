@@ -15,15 +15,17 @@ public class VirusCloud : MonoBehaviour {
         emissionModule = virusParticleSystem.emission;
     }
 
-    public void TakeDamage(int damage) {
+    public void TakeDamage(float damage) {
         currentHP -= damage;
-        healthBar.UpdateHealth((float) currentHP / (float) maxHP);
-
-        float emissionRate = Mathf.Lerp(0, 100, currentHP / maxHP);
-        //.rateOverTime = emissionRate;
+        healthBar.UpdateHealth((float)currentHP / (float)maxHP);
 
         if (currentHP <= 0) {
-            Destroy(gameObject);
+            DestroyVirus();
         }
+    }
+
+    void DestroyVirus() {
+        HospitalManager.Instance.VirusDestroyed();
+        Destroy(gameObject);
     }
 }

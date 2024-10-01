@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SprayCollisionHandler : MonoBehaviour {
-    public float damagePerParticle = 1;
+    public float damagePerParticle = 0.01f;
 
     void OnParticleCollision(GameObject other) {
         VirusCloud virusCloud = other.GetComponent<VirusCloud>();
