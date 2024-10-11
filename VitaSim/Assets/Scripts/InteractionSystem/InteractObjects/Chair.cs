@@ -2,12 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Notes: MonoBehaviour, IInteractable {
-    public string InteractionPrompt => "Article about viruses";
+public class Chair : MonoBehaviour, IInteractable {
+    public string InteractionPrompt => "Clean chair handle";
     private InteractionPromptUI promptUI;
-
-    public string[] pages;
-    public Sprite[] pageImages;
 
     private void Awake() {
         promptUI = GetComponentInChildren<InteractionPromptUI>();
@@ -15,7 +12,7 @@ public class Notes: MonoBehaviour, IInteractable {
 
     public bool IsInteractable {
         get {
-            return HospitalManager.Instance.State == GameState.ReadAllNotes;
+            return HospitalManager.Instance.State == GameState.CleanFacility;
         }
     }
 
@@ -25,9 +22,8 @@ public class Notes: MonoBehaviour, IInteractable {
             return false;
         }
 
-        NoteUIController.Instance.OpenNoteUI(pages, pageImages);
-        interactor.enabled = false;
-
+        HospitalManager.Instance.UpdateGameState(GameState.PickUpSanitizerSprayCan);
+       
         return true;
     }
 

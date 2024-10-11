@@ -1,13 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Notes: MonoBehaviour, IInteractable {
-    public string InteractionPrompt => "Article about viruses";
+public class Window : MonoBehaviour, IInteractable {
+    public string InteractionPrompt => "Open Window";
     private InteractionPromptUI promptUI;
 
-    public string[] pages;
-    public Sprite[] pageImages;
+    public GameObject windowPane;
 
     private void Awake() {
         promptUI = GetComponentInChildren<InteractionPromptUI>();
@@ -15,24 +12,26 @@ public class Notes: MonoBehaviour, IInteractable {
 
     public bool IsInteractable {
         get {
-            return HospitalManager.Instance.State == GameState.ReadAllNotes;
+            return HospitalManager.Instance.State == GameState.OpenWindows;
         }
     }
 
     public bool Interact(Interactor interactor) {
         if (!IsInteractable) {
-            Debug.Log("I don't need this right now.");
             return false;
         }
 
-        NoteUIController.Instance.OpenNoteUI(pages, pageImages);
-        interactor.enabled = false;
+        windowPane.SetActive(false);
+
+        HospitalManager.Instance.UpdateGameState(GameState.DisinfectWipes);
 
         return true;
     }
 
     public void ShowPrompt() {
-        promptUI.Setup(InteractionPrompt, transform);
+        if (promptUI != null) {
+            promptUI.Setup(InteractionPrompt, transform);
+        }
     }
 
     public void HidePrompt() {

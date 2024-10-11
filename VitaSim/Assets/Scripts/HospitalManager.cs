@@ -2,23 +2,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
-public enum GameState
-{
+public enum GameState {
    TalkToDoctor,
    DisinfectYourHands,
    FindMedication,
    GiveMedicationToPatient,
    ReportFindingsToDoctor,
    ReadAllNotes,
+   OpenWindows,
+   DisinfectWipes,
+   CleanFacility,
    PickUpSanitizerSprayCan,
    DestroyAllViruses,
    SubmitReportToChiefDoctor,
    CompleteLevel
 }
 
-public class HospitalManager : MonoBehaviour, LevelManager
-{ 
+public class HospitalManager : MonoBehaviour, LevelManager {
     // Game State Management
     public static HospitalManager Instance { get; private set; }
     [SerializeField] public GameState State;
@@ -27,45 +29,45 @@ public class HospitalManager : MonoBehaviour, LevelManager
     [SerializeField] public GameObject outbreakHUD;
     [SerializeField] public HealthBar healthBar;
     public float outbreakPercentage = 0f;
-    public float outbreakIncreaseRate = 5f;
+    public float outbreakIncreaseRate = 10f;
     private bool outbreakActive = false;
 
     // Virus Management
-    public int totalVirusCount = 5;
-    private int remainingVirusCount;
-    [SerializeField] public GameObject virus1;
-    [SerializeField] public GameObject virus2;
-    [SerializeField] public GameObject virus3;
-    [SerializeField] public GameObject virus4;
-    [SerializeField] public GameObject virus5;
-
+    [SerializeField] public GameObject covid;
+    [SerializeField] public GameObject norovirus;
+    [SerializeField] public GameObject influenza_1;
+    [SerializeField] public GameObject influenza_2;
+    [SerializeField] public GameObject influenzaCanvas_1;
+    [SerializeField] public GameObject influenzaCanvas_2;
     [SerializeField] public GameObject sprayCan;
+    [SerializeField] public GameObject disinfectWipe;
+    public int totalVirusCount = 2;
+    private int remainingVirusCount;
 
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
+    private void Awake() {
+        if (Instance != null && Instance != this) {
             Destroy(this.gameObject);
-        }
-        else
-        {
-            Instance = this;
+        } else {
+             Instance = this;
         }
     }
-
+  
     private void Start() {
         StartLevel(null);
     }
 
     void Update() {
-        if (State == GameState.DestroyAllViruses) {
+        if (State == GameState.OpenWindows ||
+            State == GameState.DisinfectWipes ||
+            State == GameState.CleanFacility ||
+            State == GameState.PickUpSanitizerSprayCan || 
+            State == GameState.DestroyAllViruses) {
+
             if(!outbreakActive) {
                 outbreakActive = true;
             }
 
-            Debug.Log("Outbreak Percentage Before: " + outbreakPercentage);
             IncreaseOutbreakOverTime();
-            Debug.Log("Outbreak Percentage After: " + outbreakPercentage);
             CheckGameOver();
         }
     }
@@ -92,6 +94,15 @@ public class HospitalManager : MonoBehaviour, LevelManager
             case GameState.ReadAllNotes:
                 HandleReadAllNotes();
                 break;
+            case GameState.OpenWindows:
+                HandleOpenWindows();
+                break;
+            case GameState.DisinfectWipes:
+                HandlePickupDisinfectWipes();
+                break;
+            case GameState.CleanFacility:
+                HandleCleanFacility();
+                break;
             case GameState.PickUpSanitizerSprayCan:
                 HandlePickUpSanitizerSprayCan();
                 break;
@@ -115,69 +126,120 @@ public class HospitalManager : MonoBehaviour, LevelManager
     }
 
     public void CompleteLevel() {
-        Debug.Log("Level Completed!");
     }
 
     private void HandleTalkToDoctor() {
         UIManager.Instance.UpdateTaskText("Talk to the doctor");
-        UIManager.Instance.UpdateDailyTaskText("Task 1/10");
+        UIManager.Instance.UpdateDailyTaskText("Task 1/13"); 
+        
+        Transform newTarget = GameObject.Find("Doctor").transform;
+        NavigationPath.Instance.SetNewTarget(newTarget);
     }
 
     private void HandleDisinfectYourHands() {
         UIManager.Instance.UpdateTaskText("Disinfect your hands");
-        UIManager.Instance.UpdateDailyTaskText("Task 2/10");
+        UIManager.Instance.UpdateDailyTaskText("Task 2/13");
+
+        Transform newTarget = GameObject.Find("SanitizerDispenser").transform;
+        NavigationPath.Instance.SetNewTarget(newTarget);
     }
 
     private void HandleFindMedication() {
         UIManager.Instance.UpdateTaskText("Find the medication");
-        UIManager.Instance.UpdateDailyTaskText("Task 3/10");
+        UIManager.Instance.UpdateDailyTaskText("Task 3/13");
+
+        Transform newTarget = GameObject.Find("MedicalKit").transform;
+        NavigationPath.Instance.SetNewTarget(newTarget);
     }
 
     private void HandleGiveMedicationToPatient() {
         UIManager.Instance.UpdateTaskText("Cure the patient");
-        UIManager.Instance.UpdateDailyTaskText("Task 4/10");
+        UIManager.Instance.UpdateDailyTaskText("Task 4/13");
+
+        Transform newTarget = GameObject.Find("Patient_1").transform;
+        NavigationPath.Instance.SetNewTarget(newTarget);
     }
 
     private void HandleReportFindingsToDoctor() {
         UIManager.Instance.UpdateTaskText("Report to doctor");
-        UIManager.Instance.UpdateDailyTaskText("Task 5/10");
+        UIManager.Instance.UpdateDailyTaskText("Task 5/13");
+
+        Transform newTarget = GameObject.Find("Doctor").transform;
+        NavigationPath.Instance.SetNewTarget(newTarget);
     }
 
     private void HandleReadAllNotes() {
         UIManager.Instance.UpdateTaskText("Read the article");
-        UIManager.Instance.UpdateDailyTaskText("Task 6/10");
+        UIManager.Instance.UpdateDailyTaskText("Task 6/13");
+
+        Transform newTarget = GameObject.Find("Note").transform;
+        NavigationPath.Instance.SetNewTarget(newTarget);
+    }
+    private void HandleOpenWindows() {
+        UIManager.Instance.UpdateTaskText("Open the window in the lobby");
+        UIManager.Instance.UpdateDailyTaskText("Task 7/13");
+
+        remainingVirusCount = totalVirusCount;
+        healthBar.UpdateHealth(outbreakPercentage);
+        outbreakHUD.SetActive(true);
+        covid.SetActive(true);
+        Transform newTarget = GameObject.Find("Window").transform;
+        NavigationPath.Instance.SetNewTarget(newTarget);
+    }
+
+    private void HandlePickupDisinfectWipes() {
+        UIManager.Instance.UpdateTaskText("Pick up the disinfect wipes");
+        UIManager.Instance.UpdateDailyTaskText("Task 8/13");
+
+        covid.SetActive(false);
+        Transform newTarget = GameObject.Find("DisinfectWipes").transform;
+        NavigationPath.Instance.SetNewTarget(newTarget);
+    }
+
+    private void HandleCleanFacility() {
+        UIManager.Instance.UpdateTaskText("Clean the chair handle");
+        UIManager.Instance.UpdateDailyTaskText("Task 9/13");
+
+        norovirus.SetActive(true);
+        disinfectWipe.SetActive(true);
+        Transform newTarget = GameObject.Find("Chair").transform;
+        NavigationPath.Instance.SetNewTarget(newTarget);
     }
 
     private void HandlePickUpSanitizerSprayCan() {
         UIManager.Instance.UpdateTaskText("Pick up the sanitizer spray can");
-        UIManager.Instance.UpdateDailyTaskText("Task 7/10");
+        UIManager.Instance.UpdateDailyTaskText("Task 10/13");
+
+        norovirus.SetActive(false);
+        disinfectWipe.SetActive(false);
+        Transform newTarget = GameObject.Find("SanitizerCan").transform;
+        NavigationPath.Instance.SetNewTarget(newTarget);
     }
 
     private void HandleDestroyAllViruses() {
-        Debug.Log("START VIRUSES");
-        remainingVirusCount = totalVirusCount;
-        healthBar.UpdateHealth(outbreakPercentage); 
-      
-        virus1.SetActive(true);
-        virus2.SetActive(true);
-        virus3.SetActive(true);
-        virus4.SetActive(true);
-        virus5.SetActive(true);
-        outbreakHUD.SetActive(true);
+        UIManager.Instance.UpdateTaskText("Eliminate remaining viruses");
+        UIManager.Instance.UpdateDailyTaskText("Task 11/13");
+
+
         sprayCan.SetActive(true);
-        UIManager.Instance.UpdateTaskText("Eliminate all viruses");
-        UIManager.Instance.UpdateDailyTaskText("Task 8/10");
+        influenzaCanvas_1.SetActive(true);
+        influenzaCanvas_2.SetActive(true);
+        influenza_1.SetActive(true);
+        influenza_2.SetActive(true);
     }
 
     private void HandleSubmitReportToChiefDoctor() {
         UIManager.Instance.UpdateTaskText("Report to doctor");
-        UIManager.Instance.UpdateDailyTaskText("Task 9/10");
+        UIManager.Instance.UpdateDailyTaskText("Task 12/13");
 
+        sprayCan.SetActive(false);
+        Transform newTarget = GameObject.Find("Doctor").transform;
+        NavigationPath.Instance.SetNewTarget(newTarget);
     }
 
     private void HandleCompleteLevel() {
         UIManager.Instance.UpdateTaskText("Level complete!");
-        UIManager.Instance.UpdateDailyTaskText("10/10");
+        UIManager.Instance.UpdateDailyTaskText("13/13");
         CompleteLevel();
     }
 
@@ -185,7 +247,6 @@ public class HospitalManager : MonoBehaviour, LevelManager
         float outbreakIncreasePerSecond = outbreakIncreaseRate / 60f;
         outbreakPercentage += outbreakIncreasePerSecond * Time.deltaTime * 3f;
         outbreakPercentage = Mathf.Clamp(outbreakPercentage, 0f, 100f);
-        Debug.Log(outbreakPercentage);
         healthBar.UpdateHealth(outbreakPercentage / 100f);
     }
 
@@ -196,7 +257,6 @@ public class HospitalManager : MonoBehaviour, LevelManager
 
     void CheckGameOver() {
         if (outbreakPercentage >= 100f) {
-            // TODO
             Debug.Log("Game Over! Outbreak reached 100%.");
         }
     }
@@ -205,7 +265,7 @@ public class HospitalManager : MonoBehaviour, LevelManager
         if (remainingVirusCount <= 0 && outbreakPercentage < 100f) {
             outbreakHUD.SetActive(false);
             sprayCan.SetActive(false);
-            UpdateGameState(GameState.CompleteLevel);
+            UpdateGameState(GameState.SubmitReportToChiefDoctor);
         }
     }
 }

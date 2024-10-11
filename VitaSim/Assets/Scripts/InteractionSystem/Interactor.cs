@@ -4,8 +4,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public class Interactor : MonoBehaviour
-{
+public class Interactor : MonoBehaviour {
+    public static Interactor Instance { get; private set; }
+
     [SerializeField] private Transform _interactionPoint;
     [SerializeField] private float _interactionPointRadius = 1.0f;
     [SerializeField] private LayerMask _interactableMask;
@@ -13,9 +14,18 @@ public class Interactor : MonoBehaviour
     [SerializeField] private Camera playerCamera;
 
     private readonly Collider[] _colliders = new Collider[3];
-    [SerializeField] private int _numFound;
+    [SerializeField] public int _numFound;
 
     private IInteractable _currentInteractable;
+
+    private void Awake() {
+        if (Instance != null && Instance != this) {
+            Destroy(this.gameObject);
+        }
+        else {
+            Instance = this;
+        }
+    }
 
     private void Start()
     {
@@ -34,7 +44,6 @@ public class Interactor : MonoBehaviour
         );
 
         if (_numFound > 0) {
-            Debug.Log("Interactable found");
             IInteractable interactable = _colliders[0].GetComponentInParent<IInteractable>();
 
             if (interactable != null && interactable.IsInteractable) {
@@ -85,6 +94,18 @@ public class Interactor : MonoBehaviour
                 _currentInteractable.Interact(this);
             }
         }
+    }
+
+    public bool IsInInteractionRange(Transform target) {
+        if (target == null) {
+            return false;
+        }
+
+        // Calculate distance from interaction point to the target's position
+        float distanceToTarget = Vector3.Distance(_interactionPoint.position, target.position);
+
+        // Return true if within interaction range
+        return distanceToTarget <= _interactionPointRadius;
     }
 
     private void OnDrawGizmos()

@@ -8,6 +8,7 @@ public class VirusCloud : MonoBehaviour {
     public HealthBar healthBar; 
     public int maxHP = 100;
     private float currentHP;
+    [SerializeField] public GameObject canvas;
 
     void Start() {
         currentHP = maxHP;
@@ -27,5 +28,6 @@ public class VirusCloud : MonoBehaviour {
     void DestroyVirus() {
         HospitalManager.Instance.VirusDestroyed();
         Destroy(gameObject);
+        Destroy(canvas);
     }
 }

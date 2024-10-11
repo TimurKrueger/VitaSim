@@ -38,7 +38,6 @@ public class Doctor: MonoBehaviour, IInteractable {
     }
 
     public void ShowPrompt() {
-        Debug.Log(HospitalManager.Instance.State);
         if (HospitalManager.Instance.State == GameState.TalkToDoctor) {
             promptUI.Setup(InteractionPrompt, transform);
         }
