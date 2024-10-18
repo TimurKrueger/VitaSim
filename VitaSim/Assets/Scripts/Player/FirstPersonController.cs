@@ -1,156 +1,57 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using static UnityEngine.InputSystem.InputAction;
 using UnityEngine;
-using TMPro;
 
-public class FirstPersonController : MonoBehaviour
-{
-    #region Singletion
-    public static FirstPersonController Instance;
+[RequireComponent(typeof(CharacterController))]
+public class FirstPersonController: MonoBehaviour {
+    public float walkingSpeed = 4f;
+    public float runningSpeed = 11f;
+    public float jumpSpeed = 8.0f;
+    public float gravity = 20.0f;
+    public Camera playerCamera;
+    public float lookSpeed = 2.0f;
+    public float lookXLimit = 45.0f;
 
-    private void EnforceSingleton()
-    {
-        if (Instance == null) Instance = this;
-        else if (Instance != this) Destroy(this);
-    }
-    #endregion
+    CharacterController characterController;
+    Vector3 moveDirection = Vector3.zero;
+    float rotationX = 0;
 
-    // References
-    public CharacterController characterController;
-    [SerializeField] public Transform cameraTransform;
-    //[SerializeField] private Interactor currentInteractable;
+    [HideInInspector]
+    public bool canMove = true;
 
-    // Player settings
-    public float cameraSensitivity;
-    public float moveSpeed;
-    public float moveInputDeadZone;
-    private bool canMove = true;
-    [SerializeField] private float interactionRange = 4.0f;
-
-    // Touch detection
-    int leftFingerId, rightFingerId;
-    float halfScreenWidth;
-
-    // Camera control
-    Vector2 lookInput;
-    float cameraPitch;
-
-    // Camera movement;
-    Vector2 moveTouchStartPosition;
-    Vector2 moveInput;
-
-    //public System.Action<Interactable> OnFindInteractable;
-    //public System.Action<Interactable> OnLoseInteractable;
-
-    private void Awake()
-    {
-        EnforceSingleton();
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
+        characterController = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
-
-        leftFingerId = -1;
-        rightFingerId = -1;
-
-        halfScreenWidth = Screen.width / 2;
-
-        // Calculate the movement input
-        moveInputDeadZone = Mathf.Pow(Screen.height / moveInputDeadZone, 2);
+        Cursor.visible = false;
     }
-   
-    // Update is called once per frame
-    void Update()
-    {
-        // Touch Input
-        if (!canMove) return;
 
-        GetTouchInput();
+    void Update() {
+        Vector3 forward = transform.TransformDirection(Vector3.forward);
+        Vector3 right = transform.TransformDirection(Vector3.right);
+     
+        bool isRunning = Input.GetKey(KeyCode.LeftShift);
+        float curSpeedX = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Vertical") : 0;
+        float curSpeedY = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Horizontal") : 0;
+        float movementDirectionY = moveDirection.y;
+        moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
-        if (rightFingerId != -1)
-        {
-            LookAround();
+        if (Input.GetButton("Jump") && canMove && characterController.isGrounded) {
+            moveDirection.y = jumpSpeed;
+        } else {
+            moveDirection.y = movementDirectionY;
         }
-        if(leftFingerId != -1)
-        {
-            Move();
+
+        if (!characterController.isGrounded) {
+            moveDirection.y -= gravity * Time.deltaTime;
         }
-    }
 
-    void GetTouchInput()
-    {
-        for (int i = 0; i < Input.touchCount; i++)
-        {
-            Touch t = Input.GetTouch(i);
+        characterController.Move(moveDirection * Time.deltaTime);
 
-            switch (t.phase)
-            {
-                case TouchPhase.Began:
-                    if (t.position.x < halfScreenWidth && leftFingerId == -1)
-                    {
-                        leftFingerId = t.fingerId;
-
-                        moveTouchStartPosition = t.position;
-                    }
-                    else if (t.position.x > halfScreenWidth && rightFingerId == -1)
-                    {
-                        rightFingerId = t.fingerId;
-                    }
-                    break;
-                case TouchPhase.Ended:
-                case TouchPhase.Canceled:
-                    if (t.fingerId == leftFingerId)
-                    {
-                        leftFingerId = -1;
-                    }
-                    else if (t.fingerId == rightFingerId)
-                    {
-                        rightFingerId = -1;
-                    }
-                    break;
-                case TouchPhase.Moved: 
-                    if (t.fingerId == rightFingerId)
-                    {
-                        lookInput = t.deltaPosition * cameraSensitivity * Time.deltaTime;
-                    }
-                    else if (t.fingerId == leftFingerId)
-                    {
-                        moveInput = t.position - moveTouchStartPosition;
-                    }
-                    break;
-                case TouchPhase.Stationary: 
-                    if(t.fingerId == rightFingerId)
-                    {
-                        lookInput = Vector2.zero;
-                    }
-                    break;
-            }
+        if (canMove) {
+            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
+            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
         }
-    }
-
-    void LookAround()
-    {
-        // Vertical pitch rotation
-        cameraPitch = Mathf.Clamp(cameraPitch - lookInput.y, -90f, 90f);
-        cameraTransform.localRotation = Quaternion.Euler(cameraPitch, 0, 0);
-
-        // Horizontal yaw rotation
-        transform.Rotate(transform.up, lookInput.x);
-    }
-
-    void Move()
-    {
-        // Don't move if the touch delta is shorter than the designated dead zone
-        if (moveInput.sqrMagnitude <= moveInputDeadZone) return;
-
-        // Multiply the normalized direction by the speed
-        Vector2 movementDirection = moveInput.normalized * moveSpeed * Time.deltaTime;
-
-        // Move relatively to the local transform's direction
-        characterController.Move(transform.right * movementDirection.x + transform.forward * movementDirection.y);
     }
 }

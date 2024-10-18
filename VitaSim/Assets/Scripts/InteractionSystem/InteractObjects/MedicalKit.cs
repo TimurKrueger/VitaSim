@@ -22,7 +22,6 @@ public class MedicalKit: MonoBehaviour, IInteractable {
             return false;
         }
 
-        Inventory.Instance.hasMedicalKit = true;
         HospitalManager.Instance.UpdateGameState(GameState.GiveMedicationToPatient); 
         Destroy(gameObject); 
         return true;

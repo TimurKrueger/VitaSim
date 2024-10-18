@@ -125,9 +125,6 @@ public class HospitalManager : MonoBehaviour, LevelManager {
         UpdateGameState(GameState.TalkToDoctor);
     }
 
-    public void CompleteLevel() {
-    }
-
     private void HandleTalkToDoctor() {
         UIManager.Instance.UpdateTaskText("Talk to the doctor");
         UIManager.Instance.UpdateDailyTaskText("Task 1/13"); 
@@ -240,7 +237,7 @@ public class HospitalManager : MonoBehaviour, LevelManager {
     private void HandleCompleteLevel() {
         UIManager.Instance.UpdateTaskText("Level complete!");
         UIManager.Instance.UpdateDailyTaskText("13/13");
-        CompleteLevel();
+       // TODO: Start new scenario or level
     }
 
     void IncreaseOutbreakOverTime() {
@@ -258,6 +255,7 @@ public class HospitalManager : MonoBehaviour, LevelManager {
     void CheckGameOver() {
         if (outbreakPercentage >= 100f) {
             Debug.Log("Game Over! Outbreak reached 100%.");
+            State = GameState.ReadAllNotes;
         }
     }
 
